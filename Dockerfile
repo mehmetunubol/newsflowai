@@ -24,8 +24,10 @@ RUN npm install --production
 COPY src ./src
 RUN mkdir -p assets
 
-# Build TypeScript
-RUN npm run build
+# Create dist directory and build
+RUN mkdir -p /app/dist && \
+    npm run build && \
+    ls -la /app/dist
 
 # Stage 2: Production image
 FROM node:18-slim
@@ -40,7 +42,8 @@ WORKDIR /app
 # Copy built files from builder
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/dist ./dist
-RUN mkdir -p assets
+RUN mkdir -p assets && \
+    ls -la /app
 
 # Environment variables
 ENV NODE_ENV=production
