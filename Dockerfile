@@ -22,7 +22,7 @@ RUN npm install --production
 
 # Copy source files
 COPY src ./src
-COPY assets ./assets
+RUN mkdir -p assets
 
 # Build TypeScript
 RUN npm run build
@@ -40,7 +40,7 @@ WORKDIR /app
 # Copy built files from builder
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/dist ./dist
-COPY --from=builder /app/assets ./assets
+RUN mkdir -p assets
 
 # Environment variables
 ENV NODE_ENV=production
