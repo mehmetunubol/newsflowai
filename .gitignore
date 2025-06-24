@@ -1,6 +1,7 @@
 # dependencies
 /node_modules
 /assets
+/dist
 # misc
 .DS_Store
 *.pem
