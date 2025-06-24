@@ -15,23 +15,26 @@ interface ComposeRequest {
 }
 
 async function downloadFile(url: string, outputPath: string) {
-  const response = await axios({
-    method: 'GET',
-    url,
-    responseType: 'stream'
-  });
-
-  const writer = fs.createWriteStream(outputPath);
-  response.data.pipe(writer);
-
-  return new Promise<void>((resolve, reject) => {
-    writer.on('finish', () => resolve());
-    writer.on('error', (err) => reject(err));
-  });
+  try {
+    const response = await axios({
+      method: 'GET',
+      url,
+      responseType: 'stream'
+    });
+    const writer = fs.createWriteStream(outputPath);
+    response.data.pipe(writer);
+    return new Promise<void>((resolve, reject) => {
+      writer.on('finish', resolve);
+      writer.on('error', reject);
+    });
+  } catch (error) {
+    console.error(`Failed to download ${url}:`, error);
+    throw error;
+  }
 }
 
 const composeVideoHandler = async (req: Request<{}, {}, ComposeRequest>, res: Response) => {
-  const tempDir = path.join(process.cwd(), 'temp', uuidv4());
+  const tempDir = path.join('/tmp', 'newsflowai-temp', uuidv4());
   fs.mkdirSync(tempDir, { recursive: true });
 
   try {
@@ -61,7 +64,11 @@ const composeVideoHandler = async (req: Request<{}, {}, ComposeRequest>, res: Re
     res.status(500).json({ error: 'Failed to compose video' });
   } finally {
     // Cleanup temp files
-    fs.rmSync(tempDir, { recursive: true, force: true });
+    try {
+      fs.rmSync(tempDir, { recursive: true, force: true });
+    } catch (cleanupError) {
+      console.error('Cleanup error:', cleanupError);
+    }
   }
 };
 
