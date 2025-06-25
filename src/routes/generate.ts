@@ -50,7 +50,7 @@ const composeVideoHandler = async (req: Request<{}, {}, ComposeRequest>, res: Re
 
     const visualsPaths = await Promise.all(
       visualsUrls.map(async (url, i) => {
-        const visualPath = path.join(tempDir, `visual-${i}.mp4`);
+        const visualPath = path.join(tempDir, `visual-${i}.png`);
         await downloadFile(url, visualPath);
         return visualPath;
       })
