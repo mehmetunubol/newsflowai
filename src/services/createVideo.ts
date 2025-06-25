@@ -18,11 +18,17 @@ async function getAudioDuration(filePath: string): Promise<number> {
     }
 }
 
+interface VideoResult {
+    buffer: Buffer;
+    contentType: string;
+    originalPath: string;
+}
+
 export async function createVideo(
     voiceoverPath: string,
     visualsPaths: string[],
     subtitlesPath: string
-): Promise<string> {
+): Promise<VideoResult> {
     try {
         // Use /tmp in production (Cloud Run), local assets folder in development
         const isProduction = process.env.NODE_ENV === 'production';
@@ -85,7 +91,19 @@ export async function createVideo(
             throw new Error('FFmpeg failed to create output file');
         }
 
-        return isProduction ? '/tmp/final_reel.mp4' : '/assets/final_reel.mp4';
+        // Read the video file into memory
+        const videoBuffer = await fs.promises.readFile(outputPath);
+        
+        // Clean up temp file in production
+        if (isProduction) {
+            await fs.promises.unlink(outputPath).catch(console.error);
+        }
+
+        return {
+            buffer: videoBuffer,
+            contentType: 'video/mp4',
+            originalPath: outputPath
+        };
     } catch (error) {
         console.error('Error creating video:', error);
         throw new Error('Failed to create video');

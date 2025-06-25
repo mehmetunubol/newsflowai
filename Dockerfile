@@ -41,8 +41,7 @@ WORKDIR /app
 # Copy built files from builder
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/dist ./dist
-RUN mkdir -p assets && \
-    ls -la /app
+
 
 # Environment variables
 ENV NODE_ENV=production
