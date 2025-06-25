@@ -2,9 +2,17 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import path from 'path';
+import mongoose from 'mongoose';
 import generateRouter from './routes/generate';
+import voiceRouter from './routes/voice';
 
 dotenv.config();
+
+// MongoDB Connection
+const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/newsflowai';
+mongoose.connect(MONGODB_URI)
+  .then(() => console.log('Connected to MongoDB'))
+  .catch(err => console.error('MongoDB connection error:', err));
 
 const app = express();
 const port = 3001;
@@ -16,6 +24,7 @@ app.use('/assets', express.static(path.join(__dirname, '../../assets')));
 
 // Routes
 app.use('/generate', generateRouter);
+app.use('/voice', voiceRouter);
 
 // Start server
 app.listen(port, () => {

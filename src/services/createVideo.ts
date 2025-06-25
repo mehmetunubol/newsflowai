@@ -40,7 +40,7 @@ export async function createVideo(
         }
 
         const outputPath = path.join(outputDir, 'final_reel.mp4');
-        const fontConfig = `:force_style=\'FontName=Roboto,FontSize=15,PrimaryColour=&HFFFFFF&,OutlineColour=&H000000&,BorderStyle=3\'`;
+        const fontConfig = `:force_style=\'FontName=Roboto,FontSize=12,PrimaryColour=&HFFFFFF&,OutlineColour=&H000000&,BorderStyle=3\'`;
 
         // Handle video case (single MP4 file)
         if (visualsPaths.length === 1 && visualsPaths[0].endsWith('.mp4')) {
