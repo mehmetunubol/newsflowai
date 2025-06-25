@@ -24,7 +24,16 @@ export async function createVideo(
     subtitlesPath: string
 ): Promise<string> {
     try {
-        const outputPath = path.join(__dirname, '../../assets/final_reel.mp4');
+        // Use /tmp in production (Cloud Run), local assets folder in development
+        const isProduction = process.env.NODE_ENV === 'production';
+        const outputDir = isProduction ? '/tmp' : path.join(__dirname, '../../assets');
+        
+        // Ensure directory exists
+        if (!fs.existsSync(outputDir)) {
+            fs.mkdirSync(outputDir, { recursive: true });
+        }
+
+        const outputPath = path.join(outputDir, 'final_reel.mp4');
         const fontConfig = `:force_style=\'FontName=Roboto,FontSize=15,PrimaryColour=&HFFFFFF&,OutlineColour=&H000000&,BorderStyle=3\'`;
 
         // Handle video case (single MP4 file)
@@ -76,7 +85,7 @@ export async function createVideo(
             throw new Error('FFmpeg failed to create output file');
         }
 
-        return '/assets/final_reel.mp4';
+        return isProduction ? '/tmp/final_reel.mp4' : '/assets/final_reel.mp4';
     } catch (error) {
         console.error('Error creating video:', error);
         throw new Error('Failed to create video');

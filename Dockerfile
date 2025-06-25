@@ -22,7 +22,6 @@ RUN npm install --production
 
 # Copy source files
 COPY src ./src
-RUN mkdir -p assets
 
 # Create dist directory and build
 RUN mkdir -p /app/dist && \
