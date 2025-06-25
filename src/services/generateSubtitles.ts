@@ -13,7 +13,16 @@ export async function generateSubtitles(script: string, voiceoverPath: string): 
         // Generate segmented subtitles with word-level timing
         const subtitlesContent = generateSegmentedSubtitles(script, duration, wordTimings);
 
-        const subtitlesPath = path.join(__dirname, '../../assets/subtitles.srt');
+        // Use /tmp in production (Cloud Run), local assets folder in development
+        const isProduction = process.env.NODE_ENV === 'production';
+        const outputDir = isProduction ? '/tmp' : path.join(__dirname, '../../assets');
+        
+        // Ensure directory exists
+        if (!fs.existsSync(outputDir)) {
+            fs.mkdirSync(outputDir, { recursive: true });
+        }
+
+        const subtitlesPath = path.join(outputDir, 'subtitles.srt');
         await writeFile(subtitlesPath, subtitlesContent);
         return subtitlesPath;
     } catch (error) {
